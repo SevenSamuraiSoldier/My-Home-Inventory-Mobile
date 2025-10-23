@@ -148,7 +148,7 @@
                 box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
                 border: 1px solid #333;
             }
-
+            .card img {border-radius: 0.5rem;}
             .card-header {
                 display: flex;
                 justify-content: space-between;
@@ -200,7 +200,7 @@
                 font-family: sans-serif;
                 /*font-weight: 700;*/
                 color: #b488c6;
-                font-size: 0.85em;
+                /* font-size: 0.85em; */
                 /* color: #8344e5;
             font-size: 0.75rem;
             font-family: monospace; */
@@ -300,6 +300,9 @@
                 /*  color: #e0e0e0; */
                 color: bisque;
                 text-align: center;
+            }
+            .form-group input[type="file"] {
+                font-size: 0.7rem;
             }
 
             .form-group input:focus,
@@ -422,93 +425,108 @@
                     width: 50%;
                     font-size: 1.5rem;
                 }
+                .form-group input[type="file"] {
+                    font-size: 1rem;
+                }
                 .modal-buttons button {
                     font-size: 1.25rem;
                     padding-inline: 2rem;
                 }
             }
+            .master-div {
+                margin: 0;
+                padding: 0;
+            }
+            input[type="file"] {
+                transition: all 0.3s ease;
+            }
+            input[type="file"]::file-selector-button:hover {
+                transform-origin: center left;
+                transform: scale(1.1);
+                transition: all 0.3s ease;
+            }
         </style>
     </head>
     <body>
-        <!-- Main Content Container -->
-        <div class="container">
-            <!-- Header with Add & Export Buttons -->
-            <header>
-                <h1 id="main-title"></h1>
-                <div class="header-buttons">
-                    <button id="addBtn" class="action-button add-button">
-                        <span id="addSvg"></span>
-                    </button>
+        <div class="master-div">
+                <!-- Main Content Container -->
+                <div class="container">
+                    <!-- Header with Add & Export Buttons -->
+                    <header>
+                        <h1 id="main-title"></h1>
+                        <div class="header-buttons">
+                            <button id="addBtn" class="action-button add-button">
+                                <span id="addSvg"></span>
+                            </button>
+                        </div>
+                    </header>
+                    <br />
+                    <div id="count-text-container">
+                        <div id="count-text"></div>
+                        <br />
+                        <button id="exportBtn" class="action-button">
+                            <span id="exportSvg"></span>
+                        </button>
+                    </div>
+
+                    <!-- Search Bar -->
+                    <div class="search-container">
+                        <input type="text" id="searchBar" class="search-input" placeholder="Search (Multi-Value Search with Comma)..." />
+                        <span class="search-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                                <path
+                                    d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"
+                                />
+                            </svg>
+                        </span>
+                    </div>
+
+                    <!-- Wishlist Items Container -->
+                    <div id="wishlistContainer" class="card-container">
+                        <!-- Cards will be dynamically inserted here -->
+                    </div>
+
+                    <!-- No data message -->
+                    <p id="noDataMessage" class="no-data-message">Your List is empty. Add a new entry to get started!</p>
                 </div>
-            </header>
-            <br />
-            <div id="count-text-container">
-                <div id="count-text"></div>
-                <br />
-                <button id="exportBtn" class="action-button">
-                    <span id="exportSvg"></span>
-                </button>
-            </div>
+                <!-- Modals Container -->
+                <div id="modals" class="modal-overlay">
+                    <!-- Add/Edit Modal -->
+                    <div id="addEditModal" class="modal-content">
+                        <h2 id="modalTitle">Add New Entry</h2>
+                        <form id="wishlistForm">
+                            <input type="hidden" id="docId" />
+                            <!-- Elements will be dynamically inserted here -->
+                        </form>
+                    </div>
 
-            <!-- Search Bar -->
-            <div class="search-container">
-                <input type="text" id="searchBar" class="search-input" placeholder="Search (Multi-Value Search with Comma)..." />
-                <span class="search-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
-                        <path
-                            d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"
-                        />
-                    </svg>
-                </span>
-            </div>
+                    <!-- Delete Confirmation Modal -->
+                    <div id="deleteModal" class="modal-content" style="display: none">
+                        <h2>Confirm Deletion</h2>
+                        <p style="text-align: center; color: #a0a0a0; margin-bottom: 1rem">Are you sure you want to delete this entry?</p>
+                        <div class="modal-buttons">
+                            <button id="cancelDeleteBtn" class="btn-cancel">Cancel</button>
+                            <button id="confirmDeleteBtn" class="btn-delete">Delete</button>
+                        </div>
+                    </div>
 
-            <!-- Wishlist Items Container -->
-            <div id="wishlistContainer" class="card-container">
-                <!-- Cards will be dynamically inserted here -->
-            </div>
+                    <!-- Message/Info Modal -->
+                    <div id="infoModal" class="modal-content" style="display: none">
+                        <p id="infoMessage" style="text-align: center; color: #e0e0e0; margin-bottom: 1rem"></p>
+                        <div style="display: flex; justify-content: center">
+                            <button id="closeInfoBtn" class="btn-save">Close</button>
+                        </div>
+                    </div>
+                </div>
 
-            <!-- No data message -->
-            <p id="noDataMessage" class="no-data-message">Your List is empty. Add a new entry to get started!</p>
         </div>
-
-        <!-- Modals Container -->
-        <div id="modals" class="modal-overlay">
-            <!-- Add/Edit Modal -->
-            <div id="addEditModal" class="modal-content">
-                <h2 id="modalTitle">Add New Entry</h2>
-                <form id="wishlistForm">
-                    <input type="hidden" id="docId" />
-                    <!-- Elements will be dynamically inserted here -->
-                </form>
-            </div>
-
-            <!-- Delete Confirmation Modal -->
-            <div id="deleteModal" class="modal-content" style="display: none">
-                <h2>Confirm Deletion</h2>
-                <p style="text-align: center; color: #a0a0a0; margin-bottom: 1rem">Are you sure you want to delete this entry?</p>
-                <div class="modal-buttons">
-                    <button id="cancelDeleteBtn" class="btn-cancel">Cancel</button>
-                    <button id="confirmDeleteBtn" class="btn-delete">Delete</button>
-                </div>
-            </div>
-
-            <!-- Message/Info Modal -->
-            <div id="infoModal" class="modal-content" style="display: none">
-                <p id="infoMessage" style="text-align: center; color: #e0e0e0; margin-bottom: 1rem"></p>
-                <div style="display: flex; justify-content: center">
-                    <button id="closeInfoBtn" class="btn-save">Close</button>
-                </div>
-            </div>
-        </div>
-
+    
         <script>
             const collectionName = "My_Home_Inventory";
             const appTitle = "My Home Inventory";
 
-            console.log("Collection Name: " + collectionName);
-            const prefixCountText = "No. of Entries:";
-
             const dataMap = {
+                photo1: {type: "photo", text: "Photo 1 (Optional)", filter: false, styling: "main", mode: "display", height: "300"},
                 item: {type: "input", text: "Item Name", filter: true, styling: "main", required: true},
                 location: {
                     type: "datalist",
@@ -519,6 +537,10 @@
                 },
                 info: {type: "input", text: "Additional Info.", filter: true, styling: "main"},
             };
+
+
+            console.log("Collection Name: " + collectionName);
+            const prefixCountText = "No. of Entries:";
 
             // Global variables for Firebase configuration
             const firebaseConfig = {
@@ -564,8 +586,8 @@
             const noDataMessage = document.getElementById("noDataMessage");
             const searchInput = document.getElementById("searchBar");
             let visibleEntriesCount = 0; // To Track total no. of entries in the database
-            //console.log("count at load: " + visibleEntriesCount); // For Debugging
             const countText = document.getElementById("count-text");
+            let editingPhotoOGBase64 = {};
 
             //----Helper Functions---Generalised Code--------------//////////////
             // Helper function to show a modal
@@ -601,22 +623,41 @@
 
             function updateCountText() {
                 countText.textContent = `${prefixCountText} ${visibleEntriesCount}`;
-                //console.log("count text updated by the Fn " + visibleEntriesCount); // For Debugging
             }
 
+            // Major Modification on v_2.5
             function parseKeywords(query) {
-                // Split preserving whether comma was present
+                // Split on commas separating units, preserving spaces in units
                 const parts = query.split(/,/g);
                 const result = [];
-                for (let i = 0; i < parts.length; i++) {
-                    let trimmed = parts[i].trim();
-                    if (trimmed.length > 0) {
-                        // For all but last item, there was a comma after this word
-                        const hasComma = i < parts.length - 1;
-                        result.push({word: trimmed, hasComma});
+
+                parts.forEach(part => {
+                    // Preserve spaces within the part (do NOT trim inside)
+                    const trimmedEnd = part.replace(/\s+$/, ''); // trim only trailing spaces for logic
+                    const endsWithSpace = part.length > trimmedEnd.length;
+                    const trimmedPart = part.trimStart(); // trim only start to preserve trailing spaces for match criteria
+
+                    if (trimmedPart.length > 0) {
+                        result.push({
+                            word: trimmedPart,
+                            endsWithSpace: endsWithSpace, // true if unit ends with space (before comma)
+                            /* hasComma: true // always true except last, handled below */
+                        });
                     }
-                }
+                });
+
+                // Mark last element hasComma = false
+                /*  if (result.length > 0) {
+                    result[result.length - 1].hasComma = false;
+                } */
+
                 return result;
+            }
+
+            // Utility to escape special regex characters in search words (to avoid regex syntax errors)
+            // Added in v_2.5
+            function escapeRegex(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             }
 
             async function exportData() {
@@ -709,6 +750,32 @@
                 });
             }
 
+            // Function to resize the photo to heightLimit variable & Convert to Base64
+            function fileToBase64(file, heightLimit) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const targetHeight = heightLimit;
+                            const aspectRatio = img.width / img.height;
+                            canvas.height = targetHeight;
+                            canvas.width = targetHeight * aspectRatio;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            // You can adjust the JPEG quality here (0.1 to 1)
+                            const resizedBase64 = canvas.toDataURL('image/jpeg', 1);
+                            resolve(resizedBase64);
+                        };
+                        img.onerror = reject;
+                        img.src = reader.result;
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+
             /////////////////////////////////////////////////////////////////////
 
             window.onload = function () {
@@ -770,9 +837,7 @@
                     await db.collection(collectionName).doc(docId).delete();
                     showInfoModal("Entry deleted successfully!");
                     hideModal(deleteModal);
-                    //console.log("count before entry delete: " + visibleEntriesCount); // For Debugging
                     //visibleEntriesCount--;
-                    //console.log("count updated after entry deleted: " + visibleEntriesCount); // For Debugging
                     updateCountText();
                 } catch (error) {
                     console.error("Error deleting document: ", error);
@@ -785,7 +850,7 @@
             cancelDeleteBtn.addEventListener("click", () => hideModal(deleteModal));
 
             // Search bar input Ebent Listener
-            searchInput.addEventListener("input", (e) => {
+            searchInput.addEventListener('input', (e) => {
                 const searchTerm = e.target.value;
                 renderDocs(searchTerm);
             });
@@ -828,6 +893,17 @@
                         //console.log(optionsHtml);
 
                         /* formInnerHtml += ` ${data[key] || ""}`; */
+                    }
+                    if (config.type === "photo"){
+                        formInnerHtml += `
+                        <div class="form-group">
+                            <label for="${key}">${config.text}</label><br/>
+                            <input
+                                type="file"
+                                id="${key}"
+                                accept="image/png,image/jpeg,image/webp"/><br/>
+                        </div>\n`;
+
                     }
                 });
                 formInnerHtml += `
@@ -950,6 +1026,14 @@
                             <input type="text" id="${key}" list="${key}List" class="datalist-type" enterkeyhint="done">
                             <datalist id="${key}List"></datalist>
                         </div>\n`;
+                    }else if (config.type === "photo") {
+                        modalFormInnerHTML += `   <div class="form-group">
+                            <label for="${key}">${config.text}</label>
+                            <input
+                                type="file"
+                                id="${key}"
+                                accept="image/png,image/jpeg,image/webp"/>
+                            </div>\n`;
                     }
                 });
                 modalFormInnerHTML += `   <div class="modal-buttons">
@@ -965,153 +1049,171 @@
             }
 
             function dynamicallyRenderCards(data, doc, dataMap) {
-                let cardButtons = "";
-                let cardDetails = "";
-                let cardTitle = "";
+                let cardButtons = '';
+                let cardDetails = '';
+                let cardTitle = '';
 
                 // Title (special handling)
                 if (dataMap.title) {
                     cardTitle = `
-                    <div class="card-title">
-                        <h3 class="highlight-green">${data.title || "-"}</h3>
-                    </div>
-                `;
+                        <div class="card-title">
+                            <h3 class="highlight-green">${data.title || '-'}</h3>
+                        </div>
+                    `;
                 }
 
                 // Buttons and links
-                Object.keys(dataMap).forEach((key) => {
+                Object.keys(dataMap).forEach(key => {
                     const config = dataMap[key];
                     if (config.type === "link" && data[key]) {
                         // You can customize SVG/icon as needed per type/link
                         cardButtons += `<a href="${data[key]}" target="_blank" class="action-button">${mapLinkSvg}</a>`;
+                    }else if (config.type === "photo" && data[key]) {
+                        if(config.mode === "display"){
+                            const img = new Image();
+                            img.src = data[key];
+                            if (img.naturalWidth < img.naturalHeight){
+                                cardDetails += `
+                                <img src="${data[key]}" style="height: ${config.height}px;">`;
+                            }else {
+                                cardDetails += `
+                                <img src="${data[key]}" style="width: ${config.height}px;">`;
+                            }
+                        }else if (config.mode === "download"){
+                            console.log("Add Logic For Download here...");
+                        }else {console.log("photo mode vaue is invalid!")}
+                        
+                        
                     }
                 });
 
                 // Edit/delete buttons (always present)
                 cardButtons += `
-                <button class="action-button edit-button" data-id="${doc.id}">${editBtnSvg}</button>
-                <button class="action-button delete-button" data-id="${doc.id}">${deleteBtnSvg}</button>
-            `;
+                    <button class="action-button edit-button" data-id="${doc.id}">${editBtnSvg}</button>
+                    <button class="action-button delete-button" data-id="${doc.id}">${deleteBtnSvg}</button>
+                `;
 
                 // Details
-                Object.keys(dataMap).forEach((key) => {
+                Object.keys(dataMap).forEach(key => {
                     const config = dataMap[key];
-                    if (key !== "title" && config.type !== "link") {
+                    if (key !== "title" && config.type !== "link" && config.type !== "photo") {
                         // Generate label with fallback value
-                        let value = data[key] || "-";
+                        let value = data[key] || '-';
                         let line = "";
                         if (config.styling === "strong") {
                             line = `<p class="card-detail"><strong>${config.text}:</strong> <span class="highlight-green card-values"> &nbsp;${value}</span></p>`;
                             //console.log("this block"); // For Debugging
-                        } else {
+                        }else {
                             line = `<p class="card-detail"><strong>${config.text}:</strong><span class="card-values"> &nbsp;${value}</span></p>`;
                         }
-
+                        
+                        
                         cardDetails += line;
                     }
                 });
 
                 // Build card HTML
                 return `
-                <div class="card-header">
-                    ${cardTitle}
-                    <div class="card-buttons">
-                        ${cardButtons}
+                    <div class="card-header">
+                        ${cardTitle}
+                        <div class="card-buttons">
+                            ${cardButtons}
+                        </div>
                     </div>
-                </div>
-                <div class="card-details">
-                    ${cardDetails}
-                </div>
-            `;
+                    <div class="card-details">
+                        ${cardDetails}
+                    </div>
+                `;
             }
 
             // Card rendering function
             function createCard(doc) {
                 const data = doc.data();
-                const card = document.createElement("div");
-                card.className = "card";
+                const card = document.createElement('div');
+                card.className = 'card';
                 card.innerHTML = dynamicallyRenderCards(data, doc, dataMap);
                 return card;
             }
 
-            // Render documents based on search query
+            // Render documents based on search query - Major Modification on v_2.5
             function renderDocs(query) {
-                wishlistContainer.innerHTML = "";
+                wishlistContainer.innerHTML = '';
                 const keywordObjs = parseKeywords(query.toLowerCase());
 
-                const filteredDocs = allDocs.filter((doc) => {
+                const filteredDocs = allDocs.filter(doc => {
                     const data = doc.data();
 
                     if (keywordObjs.length === 0) return true;
 
-                    return keywordObjs.every(({word, hasComma}) => {
+                    return keywordObjs.every(({ word, endsWithSpace }) => {
                         let regex;
-                        if (hasComma) {
-                            //console.log("Whole Word Match Regex.."); // For Debugging
-                            // Whole word match
-                            regex = new RegExp(`\\b${word}\\b`, "i");
+
+                        // Use whole word match if endsWithSpace, else prefix match
+                        if (endsWithSpace) {
+                            regex = new RegExp(`\\b${escapeRegex(word.trimEnd())}\\b`, 'i'); // whole word match
                         } else {
-                            // Prefix match
-                            regex = new RegExp(`\\b${word}`, "i");
+                            regex = new RegExp(`\\b${escapeRegex(word)}`, 'i');    // prefix match
                         }
-                        let searchableText = "";
-                        Object.keys(dataMap).forEach((key) => {
-                            const config = dataMap[key];
-                            if (config.filter === true) {
+
+                        let searchableText = '';
+                        Object.keys(dataMap).forEach(key => {
+                            if (dataMap[key].filter === true) {
                                 searchableText += ` ${data[key] || ""}`;
                             }
                         });
-                        //console.log(searchableText); // For Debugging
+
                         return regex.test(searchableText);
                     });
                 });
+
                 visibleEntriesCount = 0;
                 if (filteredDocs.length === 0) {
-                    noDataMessage.style.display = "block";
-                    noDataMessage.textContent = "No matching entries found.";
-                    //visibleEntriesCount ++;
+                    noDataMessage.style.display = 'block';
+                    noDataMessage.textContent = 'No matching entries found.';
                 } else {
-                    noDataMessage.style.display = "none";
-                    filteredDocs.forEach((doc) => {
+                    noDataMessage.style.display = 'none';
+                    filteredDocs.forEach(doc => {
                         const card = createCard(doc);
                         wishlistContainer.appendChild(card);
-                        //console.log("count before renderDocs: " + visibleEntriesCount); // For Debugging
                         visibleEntriesCount++;
-                        //console.log("count updated after renderDocs: " + visibleEntriesCount); // For Debugging
-
                     });
                 }
                 updateCountText();
             }
 
             // Delegate click events for edit and delete buttons on the wishlist container
-            wishlistContainer.addEventListener("click", (e) => {
-                const editBtn = e.target.closest(".edit-button");
-                const deleteBtn = e.target.closest(".delete-button");
-
+            wishlistContainer.addEventListener('click', (e) => {
+                const editBtn = e.target.closest('.edit-button');
+                const deleteBtn = e.target.closest('.delete-button');
+                
                 if (editBtn) {
                     const docId = editBtn.dataset.id;
                     console.log(docId); // For Debugging
-                    db.collection(collectionName)
-                        .doc(docId)
-                        .get()
-                        .then((doc) => {
-                            if (doc.exists) {
-                                const data = doc.data();
-                                docIdInput.value = docId;
+                    db.collection(collectionName).doc(docId).get().then(doc => {
+                        if (doc.exists) {
+                            const data = doc.data();
+                            docIdInput.value = docId;
 
-                                Object.keys(dataMap).forEach((key) => {
-                                    // const config = dataMap[key];
-                                    document.getElementById(`${key}`).value = data[key] || "";
-                                });
-                                modalTitle.textContent = "Edit Entry";
-                                showModal(addEditModal);
-                            }
-                        })
-                        .catch((error) => {
-                            console.error("Error fetching document for edit: ", error);
-                            showInfoModal("Could not load entry for editing.");
-                        });
+                            Object.keys(dataMap).forEach(key => {
+                                // const config = dataMap[key];
+                                if (dataMap[key].type === "photo"){
+                                    editingPhotoOGBase64[key] = data[key];
+                                    //console.log(key); // For Debugging
+                                    // console.log(editingPhotoOGBase64[key]); // For Debugging
+                                    //console.log("photo data");
+                                    return;
+                                }else {
+                                    document.getElementById(`${key}`).value = data[key] || '';
+                                }
+                                
+                            });
+                            modalTitle.textContent = 'Edit Entry';
+                            showModal(addEditModal);
+                        }
+                    }).catch(error => {
+                        console.error("Error fetching document for edit: ", error);
+                        showInfoModal("Could not load entry for editing.");
+                    });
                 }
 
                 if (deleteBtn) {
@@ -1119,32 +1221,55 @@
                     console.log(docId); // For Debugging
                     showModal(deleteModal);
                     confirmDeleteBtn.dataset.id = docId;
+                    
                 }
             });
 
             // Handle form submission for Add/Edit
-            wishlistForm.addEventListener("submit", async (e) => {
+            wishlistForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-
+            
                 const docId = docIdInput.value;
                 let data = {};
-                Object.keys(dataMap).forEach((key) => {
+                /* Object.keys(dataMap).forEach(async key => {....}); Old Code Block....*/ 
+                for (const key of Object.keys(dataMap)) {
                     const element = document.getElementById(key);
+                    // console.log(element); // For Debugging
                     if (element) {
                         const rawValue = element.value.trim();
-                        if (!rawValue) {
-                            data[key] = "";
-                        } else {
+                        
                             if (dataMap[key].type === "link") {
                                 data[key] = rawValue;
+                            }else if (dataMap[key].type === "photo"){
+                                data[key] = editingPhotoOGBase64[key];
+                                // console.log(data[key]); // For Debugging
+                                const input = document.getElementById(key);
+                                
+                                if (input && input.files && input.files.length > 0) 
+                                {
+                                    const photoFile = input.files[0];
+                                    // console.log(photoFile); // For Debugging
+            
+                                    const heightLimit = dataMap[key].height;
+                                    // console.log("heightLimit: " + heightLimit); // For Debugging
+                                    const photoBase64 = await fileToBase64(photoFile, heightLimit);
+                                    // console.log("photoBase64: " + photoBase64); // For Debugging
+                                    data[key] = photoBase64;
+                                    // console.log("[key]: " + key); // For Debugging
+                                    // console.log("data[key]: " + data[key]); // For Debugging
+                                    console.log("photoFile is NOT EMPTY");
+                                }else {
+                                    console.log("photoFile is EMPTY");
+                                    // data[key] = editingPhotoOGBase64[key]; //This code is not needed
+                                }
                             } else {
                                 data[key] = capitalizeEachWord(rawValue);
                             }
-                        }
+                        
                     } else {
                         data[key] = null;
                     }
-                });
+                };
                 // Add timestamp as the last key
                 data.timestamp = Date.now();
                 // console.log(data); // For Debugging
@@ -1155,10 +1280,10 @@
                         showInfoModal("Entry updated successfully!");
                     } else {
                         await db.collection(collectionName).add(data);
+                        console.log(data);
+                        console.log("New entry added successfully!");
                         showInfoModal("New entry added successfully!");
-                        //console.log("count before form sumbit: " + visibleEntriesCount); // For Debugging
-                        //visibleEntriesCount++;
-                        //console.log("count updated after form submit: " + visibleEntriesCount); // For Debugging
+                        //visibleEntriesCount ++;
                         updateCountText();
                     }
                     hideModal(addEditModal);
@@ -1167,6 +1292,7 @@
                     showInfoModal("Error saving entry. Please try again.");
                 }
             });
+
         </script>
     </body>
 </html>
